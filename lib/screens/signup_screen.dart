@@ -32,19 +32,29 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+    final confirm = _confirmPasswordController.text;
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
       return;
     }
 
-    if (_passwordController.text != _confirmPasswordController.text) {
+    if (password != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 6 characters')),
       );
       return;
     }
@@ -59,21 +69,25 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      context.read<AuthProvider>().signup(
-            _nameController.text,
-            _emailController.text,
-            _phoneController.text,
-            _passwordController.text,
-          );
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/');
-      }
+      await context.read<AuthProvider>().signup(name, email, phone, password);
+      if (!mounted) return;
+
+      // Supabase may require email confirmation depending on your project settings.
+      // Show a confirmation message and let the user log in manually.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Account created! Please check your email to confirm, then log in.',
+          ),
+          duration: Duration(seconds: 4),
+        ),
+      );
+      Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signup failed: $e')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -88,21 +102,17 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             Text(
               'Create Your Account',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-
             const SizedBox(height: 8),
-
             Text(
               'Join Shireen Bakers community',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-
             const SizedBox(height: 24),
 
             // Full Name
@@ -113,7 +123,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 prefixIcon: Icon(Icons.person_outlined),
               ),
             ),
-
             const SizedBox(height: 16),
 
             // Email
@@ -125,7 +134,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
-
             const SizedBox(height: 16),
 
             // Phone
@@ -137,7 +145,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 prefixIcon: Icon(Icons.phone_outlined),
               ),
             ),
-
             const SizedBox(height: 16),
 
             // Password
@@ -145,7 +152,7 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _passwordController,
               obscureText: _obscurePassword,
               decoration: InputDecoration(
-                hintText: 'Password',
+                hintText: 'Password (min. 6 characters)',
                 prefixIcon: const Icon(Icons.lock_outlined),
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -153,13 +160,11 @@ class _SignupScreenState extends State<SignupScreen> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  },
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
 
             // Confirm Password
@@ -175,24 +180,21 @@ class _SignupScreenState extends State<SignupScreen> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () {
-                    setState(() =>
-                        _obscureConfirmPassword = !_obscureConfirmPassword);
-                  },
+                  onPressed: () => setState(
+                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                  ),
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
 
-            // Terms & Conditions Checkbox
+            // Terms checkbox
             Row(
               children: [
                 Checkbox(
                   value: _agreedToTerms,
-                  onChanged: (value) {
-                    setState(() => _agreedToTerms = value ?? false);
-                  },
+                  onChanged: (v) =>
+                      setState(() => _agreedToTerms = v ?? false),
                 ),
                 Expanded(
                   child: GestureDetector(
@@ -207,10 +209,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
 
-            // Sign Up Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -229,10 +229,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     : const Text('Create Account'),
               ),
             ),
-
             const SizedBox(height: 16),
 
-            // Login Link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

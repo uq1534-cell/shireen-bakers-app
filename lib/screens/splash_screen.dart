@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/app_colors.dart';
 import '../providers/auth_provider.dart';
+import '../providers/cart_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,25 +15,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToNextScreen();
+    _initialize();
   }
 
-  Future<void> _navigateToNextScreen() async {
-    // Simulate splash duration
-    await Future.delayed(const Duration(seconds: 3));
-
+  Future<void> _initialize() async {
+    // Allow the splash UI to render before doing async work
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    final authProvider = context.read<AuthProvider>();
-    final isLoggedIn = authProvider.isLoggedIn;
+    // Restore Supabase session (no-op when no active session)
+    final auth = context.read<AuthProvider>();
+    await auth.initializeSession();
+    if (!mounted) return;
 
-    if (mounted) {
-      if (isLoggedIn) {
-        Navigator.of(context).pushReplacementNamed('/');
-      } else {
-        Navigator.of(context).pushReplacementNamed('/');
-      }
+    // If a session was restored, load the user's cart
+    if (auth.isLoggedIn) {
+      await context.read<CartProvider>().loadFromSupabase();
     }
+
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed('/');
   }
 
   @override
@@ -42,7 +44,6 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Logo
           Center(
             child: Container(
               padding: const EdgeInsets.all(40),
@@ -55,8 +56,6 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ),
           const SizedBox(height: 24),
-
-          // App Name
           Text(
             'Shireen Bakers',
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
@@ -65,8 +64,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
           ),
           const SizedBox(height: 8),
-
-          // Tagline
           Text(
             'Premium Bakery Experience',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -74,10 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontWeight: FontWeight.w500,
                 ),
           ),
-
           const SizedBox(height: 60),
-
-          // Loading indicator
           const SizedBox(
             width: 40,
             height: 40,

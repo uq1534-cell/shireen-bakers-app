@@ -1,10 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/app_colors.dart';
+import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/order_provider.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  bool _isCheckingOut = false;
+
+  Future<void> _handleCheckout(CartProvider cart) async {
+    final auth = context.read<AuthProvider>();
+
+    // Require login
+    if (!auth.isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please sign in to place an order'),
+        ),
+      );
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
+    // Collect delivery address
+    final addressController = TextEditingController();
+    final address = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delivery Address'),
+        content: TextField(
+          controller: addressController,
+          decoration: const InputDecoration(
+            hintText: 'Enter your full delivery address',
+            prefixIcon: Icon(Icons.location_on_outlined),
+          ),
+          maxLines: 2,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = addressController.text.trim();
+              if (text.isEmpty) return;
+              Navigator.pop(ctx, text);
+            },
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+    addressController.dispose();
+
+    if (address == null || address.isEmpty) return;
+    if (!mounted) return;
+
+    setState(() => _isCheckingOut = true);
+
+    try {
+      final items = cart.items.values.toList();
+
+      await context.read<OrderProvider>().placeOrder(items, address);
+      if (!mounted) return;
+
+      cart.clearCart();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Order placed successfully! 🎉'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      Navigator.pushNamed(context, '/track-order');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to place order: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isCheckingOut = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,15 +384,21 @@ class CartScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Proceeding to checkout...'),
-                            ),
-                          );
-                          // Handle checkout
-                        },
-                        child: const Text('Proceed to Checkout'),
+                        onPressed: _isCheckingOut
+                            ? null
+                            : () => _handleCheckout(cart),
+                        child: _isCheckingOut
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.textWhite,
+                                  ),
+                                ),
+                              )
+                            : const Text('Proceed to Checkout'),
                       ),
                     ),
 
