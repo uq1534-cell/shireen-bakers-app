@@ -26,6 +26,18 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void signup(String name, String email, String phone, String password) {
+    _user = User(
+      id: 'u${DateTime.now().millisecondsSinceEpoch}',
+      name: name,
+      email: email,
+      phone: phone,
+      address: '',
+      avatarUrl: '',
+    );
+    notifyListeners();
+  }
+
   void logout() {
     _user = const User(
       id: '',

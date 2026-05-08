@@ -7,17 +7,20 @@ class CartProvider extends ChangeNotifier {
 
   Map<String, CartItem> get items => {..._items};
 
+  // Alias for items getter for backward compatibility
+  Map<String, CartItem> get cartItems => items;
+
   int get itemCount =>
       _items.values.fold(0, (sum, item) => sum + item.quantity);
 
   double get totalAmount =>
       _items.values.fold(0.0, (sum, item) => sum + item.subtotal);
 
-  void addItem(Product product) {
+  void addItem(Product product, {int quantity = 1}) {
     if (_items.containsKey(product.id)) {
-      _items[product.id]!.quantity += 1;
+      _items[product.id]!.quantity += quantity;
     } else {
-      _items[product.id] = CartItem(product: product);
+      _items[product.id] = CartItem(product: product, quantity: quantity);
     }
     notifyListeners();
   }

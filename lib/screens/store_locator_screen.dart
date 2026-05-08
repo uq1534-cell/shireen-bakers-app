@@ -8,7 +8,10 @@ class StoreLocatorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Store Locator')),
+      appBar: AppBar(
+        title: const Text('Store Locator'),
+        elevation: 0,
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: dummyStores.length,

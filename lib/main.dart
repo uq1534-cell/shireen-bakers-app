@@ -24,9 +24,10 @@ class ShireenBakersApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Shireen Bakers',
         theme: AppTheme.lightTheme,
-        initialRoute: AppRoutes.home,
+        initialRoute: AppRoutes.splash,
         routes: AppRoutes.routes,
         onGenerateRoute: AppRoutes.onGenerateRoute,
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
