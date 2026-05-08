@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../config/app_colors.dart';
+
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});

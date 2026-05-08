@@ -14,7 +14,8 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _user.isAuthenticated;
 
-  void login(String email, String password) {
+  Future<void> login(String email, String password) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     _user = User(
       id: 'u1',
       name: 'Ayesha Khan',
@@ -26,7 +27,8 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signup(String name, String email, String phone, String password) {
+  Future<void> signup(String name, String email, String phone, String password) async {
+    await Future.delayed(const Duration(milliseconds: 500));
     _user = User(
       id: 'u${DateTime.now().millisecondsSinceEpoch}',
       name: name,
