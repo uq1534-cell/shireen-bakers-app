@@ -20,7 +20,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
     super.initState();
 
     // Create sample products
-    final product1 = Product(
+    const product1 = Product(
       id: 'p1',
       name: 'Chocolate Cake',
       categoryId: 'cakes',
@@ -30,7 +30,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
       weight: 1000,
     );
 
-    final product2 = Product(
+    const product2 = Product(
       id: 'p2',
       name: 'Fresh Cream Pastry',
       categoryId: 'pastries',
@@ -138,7 +138,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.success.withOpacity(0.1),
+                            color: AppColors.success.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.success,
@@ -321,7 +321,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                         boxShadow: step.isActive
                             ? [
                                 BoxShadow(
-                                  color: AppColors.accent.withOpacity(0.3),
+                                  color: AppColors.accent.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   spreadRadius: 2,
                                 ),

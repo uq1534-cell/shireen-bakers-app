@@ -96,7 +96,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               items: _categories
                   .map((category) => DropdownMenuItem(
                         value: category,
@@ -106,9 +106,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               onChanged: (value) {
                 setState(() => _selectedCategory = value);
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Select a category',
-                prefixIcon: const Icon(Icons.category_outlined),
+                prefixIcon: Icon(Icons.category_outlined),
               ),
             ),
 
@@ -147,9 +147,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             // Title Field
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Feedback Title',
-                prefixIcon: const Icon(Icons.title),
+                prefixIcon: Icon(Icons.title),
               ),
             ),
 
@@ -160,9 +160,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               controller: _messageController,
               minLines: 4,
               maxLines: 6,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Your detailed feedback',
-                prefixIcon: const Icon(Icons.message_outlined),
+                prefixIcon: Icon(Icons.message_outlined),
               ),
             ),
 

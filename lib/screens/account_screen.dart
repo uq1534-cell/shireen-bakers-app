@@ -29,7 +29,7 @@ class AccountScreen extends StatelessWidget {
                         Container(
                           height: 80,
                           width: 80,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppColors.accent,
                             shape: BoxShape.circle,
                           ),
@@ -180,7 +180,7 @@ class AccountScreen extends StatelessWidget {
                   Icon(
                     Icons.account_circle_outlined,
                     size: 80,
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(

@@ -88,7 +88,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.success.withOpacity(0.1),
+                            color: AppColors.success.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.success,
@@ -111,7 +111,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.error.withOpacity(0.1),
+                            color: AppColors.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
                               color: AppColors.error,
@@ -240,8 +240,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   duration: const Duration(seconds: 2),
                                 ),
                               );
+                              final nav = Navigator.of(context);
                               Future.delayed(const Duration(seconds: 1), () {
-                                Navigator.pop(context);
+                                nav.pop();
                               });
                             }
                           : null,

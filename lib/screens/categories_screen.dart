@@ -64,7 +64,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                       ? [
                                           BoxShadow(
                                             color: AppColors.accent
-                                                .withOpacity(0.3),
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 8,
                                             spreadRadius: 1,
                                           ),
@@ -125,7 +125,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                     ? [
                                         BoxShadow(
                                           color:
-                                              AppColors.accent.withOpacity(0.3),
+                                              AppColors.accent.withValues(alpha: 0.3),
                                           blurRadius: 8,
                                           spreadRadius: 1,
                                         ),
@@ -176,7 +176,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         Icon(
                           Icons.shopping_basket_outlined,
                           size: 80,
-                          color: AppColors.primary.withOpacity(0.3),
+                          color: AppColors.primary.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 16),
                         Text(

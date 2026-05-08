@@ -112,9 +112,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             // Name Field
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Your Name',
-                prefixIcon: const Icon(Icons.person_outlined),
+                prefixIcon: Icon(Icons.person_outlined),
               ),
             ),
 
@@ -124,9 +124,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Your Email',
-                prefixIcon: const Icon(Icons.email_outlined),
+                prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
 
@@ -137,9 +137,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               controller: _messageController,
               minLines: 4,
               maxLines: 6,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Your Message',
-                prefixIcon: const Icon(Icons.message_outlined),
+                prefixIcon: Icon(Icons.message_outlined),
               ),
             ),
 
