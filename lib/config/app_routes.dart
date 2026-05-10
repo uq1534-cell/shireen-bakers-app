@@ -15,6 +15,7 @@ import '../screens/terms_screen.dart';
 import '../screens/privacy_policy_screen.dart';
 import '../screens/contact_us_screen.dart';
 import '../screens/feedback_screen.dart';
+import '../screens/chat_screen.dart';
 
 class AppRoutes {
   static const splash = '/splash';
@@ -33,6 +34,7 @@ class AppRoutes {
   static const privacy = '/privacy';
   static const contact = '/contact';
   static const feedback = '/feedback';
+  static const chat = '/chat';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (_) => const SplashScreen(),
@@ -50,6 +52,7 @@ class AppRoutes {
     privacy: (_) => const PrivacyPolicyScreen(),
     contact: (_) => const ContactUsScreen(),
     feedback: (_) => const FeedbackScreen(),
+    chat: (_) => const ChatScreen(),
   };
 
   static Route<Object?>? onGenerateRoute(RouteSettings settings) {

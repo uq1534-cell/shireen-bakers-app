@@ -31,15 +31,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.surfaceColor,
       drawer: _buildDrawer(context),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        onPressed: () => Navigator.pushNamed(context, '/chat'),
+        child: const Icon(Icons.chat_bubble_rounded, color: Colors.white),
+      ),
       body: CustomScrollView(
         slivers: [
           // ── Compact Search Header ─────────────────────────────────────
           SliverPersistentHeader(
             pinned: true,
             delegate: _CompactSearchHeader(
-              onCartTap:  () => widget.onSwitchTab?.call(3),
+              onCartTap: () => widget.onSwitchTab?.call(3),
               onLoginTap: () => Navigator.pushNamed(context, '/login'),
-              onMenuTap:  (ctx) => Scaffold.of(ctx).openDrawer(),
+              onMenuTap: (ctx) => Scaffold.of(ctx).openDrawer(),
             ),
           ),
 
@@ -56,13 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 viewportFraction: 0.97,
                 onPageChanged: (_, __) => setState(() {}),
               ),
-              items: _banners.map((b) => Container(
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.asset(b, fit: BoxFit.cover, width: double.infinity),
-                ),
-              )).toList(),
+              items: _banners
+                  .map((b) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(b,
+                              fit: BoxFit.cover, width: double.infinity),
+                        ),
+                      ))
+                  .toList(),
             ),
           ),
 
@@ -74,7 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Row(children: [
                 Container(
-                  width: 4, height: 22,
+                  width: 4,
+                  height: 22,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(2),
@@ -82,8 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text('Categories',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700, color: AppColors.textDark)),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark)),
               ]),
             ),
           ),
@@ -94,8 +104,9 @@ class _HomeScreenState extends State<HomeScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: Row(
-                children: List.generate(dummyCategories.length, (i) =>
-                  Padding(
+                children: List.generate(
+                  dummyCategories.length,
+                  (i) => Padding(
                     padding: const EdgeInsets.only(right: 12),
                     child: _buildCategoryItem(
                       dummyCategories[i],
@@ -116,7 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Row(children: [
                 Container(
-                  width: 4, height: 22,
+                  width: 4,
+                  height: 22,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(2),
@@ -124,8 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text('Featured Products',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700, color: AppColors.textDark)),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark)),
               ]),
             ),
           ),
@@ -159,7 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: 76, width: 76,
+          height: 76,
+          width: 76,
           decoration: BoxDecoration(
             border: Border.all(
               color: selected ? AppColors.accent : AppColors.border,
@@ -167,14 +181,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             borderRadius: BorderRadius.circular(14),
             color: AppColors.cardBg,
-            boxShadow: [BoxShadow(
-              color: selected
-                  ? AppColors.accent.withValues(alpha: 0.35)
-                  : Colors.black.withValues(alpha: 0.06),
-              blurRadius: selected ? 10 : 4,
-              spreadRadius: selected ? 1 : 0,
-              offset: selected ? Offset.zero : const Offset(0, 2),
-            )],
+            boxShadow: [
+              BoxShadow(
+                color: selected
+                    ? AppColors.accent.withValues(alpha: 0.35)
+                    : Colors.black.withValues(alpha: 0.06),
+                blurRadius: selected ? 10 : 4,
+                spreadRadius: selected ? 1 : 0,
+                offset: selected ? Offset.zero : const Offset(0, 2),
+              )
+            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -185,12 +201,13 @@ class _HomeScreenState extends State<HomeScreen> {
         SizedBox(
           width: 76,
           child: Text(cat.name,
-            maxLines: 2, textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: selected ? AppColors.primary : AppColors.textDark,
-            )),
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? AppColors.primary : AppColors.textDark,
+              )),
         ),
       ]),
     );
@@ -220,25 +237,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.pushNamed(context, route);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 18),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(label, style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w800,
-                        color: Color(0xFF2B1A0E), letterSpacing: 0.5,
-                      )),
+                      child: Text(label,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF2B1A0E),
+                            letterSpacing: 0.5,
+                          )),
                     ),
                   ),
                 ),
-                const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                const Divider(
+                    height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
               ]);
             }),
             const Padding(
               padding: EdgeInsets.fromLTRB(20, 24, 20, 8),
-              child: Text('ALL CATEGORIES', style: TextStyle(
-                fontSize: 11, fontWeight: FontWeight.w700,
-                color: Color(0xFF9E9E9E), letterSpacing: 1.4,
-              )),
+              child: Text('ALL CATEGORIES',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF9E9E9E),
+                    letterSpacing: 1.4,
+                  )),
             ),
             ...dummyCategories.map((cat) {
               final idx = dummyCategories.indexOf(cat);
@@ -248,11 +273,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() => _selectedCategoryIndex = idx);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Text(cat.name, style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w500,
-                    color: Color(0xFFC8892A),
-                  )),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Text(cat.name,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFC8892A),
+                      )),
                 ),
               );
             }),
@@ -280,24 +308,32 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
 
   static const double _h = 116;
 
-  @override double get minExtent => _h;
-  @override double get maxExtent => _h;
-  @override bool shouldRebuild(covariant _CompactSearchHeader old) => false;
+  @override
+  double get minExtent => _h;
+  @override
+  double get maxExtent => _h;
+  @override
+  bool shouldRebuild(covariant _CompactSearchHeader old) => false;
 
   @override
   Widget build(BuildContext ctx, double shrinkOffset, bool overlaps) {
     return Consumer2<CartProvider, AuthProvider>(
       builder: (context, cart, auth, _) {
-        final count     = cart.items.length;
-        final loggedIn  = auth.isLoggedIn;
+        final count = cart.items.length;
+        final loggedIn = auth.isLoggedIn;
 
         return Container(
           height: _h,
           decoration: const BoxDecoration(
             color: Color(0xFFFAF4D3), // website cream background
-            border: Border(bottom: BorderSide(color: Color(0xFFE6BC15), width: 2.5)),
-            boxShadow: [BoxShadow(
-              color: Color(0x18000000), blurRadius: 10, offset: Offset(0, 3))],
+            border: Border(
+                bottom: BorderSide(color: Color(0xFFE6BC15), width: 2.5)),
+            boxShadow: [
+              BoxShadow(
+                  color: Color(0x18000000),
+                  blurRadius: 10,
+                  offset: Offset(0, 3))
+            ],
           ),
           child: SafeArea(
             bottom: false,
@@ -311,25 +347,30 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(children: [
                       // Hamburger
-                      Builder(builder: (bCtx) => IconButton(
-                        onPressed: () => onMenuTap(bCtx),
-                        icon: const Icon(Icons.menu_rounded,
-                            color: Color(0xFF5A3E1B), size: 26),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                      )),
+                      Builder(
+                          builder: (bCtx) => IconButton(
+                                onPressed: () => onMenuTap(bCtx),
+                                icon: const Icon(Icons.menu_rounded,
+                                    color: Color(0xFF5A3E1B), size: 26),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(
+                                    minWidth: 36, minHeight: 36),
+                              )),
 
                       // Logo + brand name stacked
-                      Expanded(child: Center(
+                      Expanded(
+                          child: Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Image.asset(
                               'assets/images/logo_transparent.png',
-                              height: 34, fit: BoxFit.contain,
+                              height: 34,
+                              fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => const Icon(
                                 Icons.cake_rounded,
-                                color: Color(0xFFE6BC15), size: 30,
+                                color: Color(0xFFE6BC15),
+                                size: 30,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -376,8 +417,9 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                           child: Text(
                             loggedIn ? 'Account' : 'Login',
                             style: const TextStyle(
-                              color: Colors.white, fontSize: 13,
-                              fontWeight: FontWeight.w700),
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -395,7 +437,8 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                           ),
                           if (count > 0)
                             Positioned(
-                              top: -2, right: -2,
+                              top: -2,
+                              right: -2,
                               child: Container(
                                 padding: const EdgeInsets.all(3),
                                 decoration: const BoxDecoration(
@@ -403,9 +446,10 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text('$count',
-                                  style: const TextStyle(
-                                    color: Colors.white, fontSize: 9,
-                                    fontWeight: FontWeight.w700)),
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w700)),
                               ),
                             ),
                         ]),
@@ -424,27 +468,31 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                           color: const Color(0xFFE6BC15), width: 1.5),
-                      boxShadow: [BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.07),
-                        blurRadius: 6, offset: const Offset(0, 2),
-                      )],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.07),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
                     ),
                     child: Row(children: const [
                       SizedBox(width: 14),
                       Icon(Icons.search_rounded,
                           color: Color(0xFFE6BC15), size: 20),
                       SizedBox(width: 8),
-                      Expanded(child: TextField(
+                      Expanded(
+                          child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Search for cakes, bread, pastries...',
-                          hintStyle: TextStyle(
-                              color: Color(0xFF9E9E9E), fontSize: 13),
+                          hintStyle:
+                              TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
-                        style: TextStyle(
-                            fontSize: 13, color: Color(0xFF0F0F0F)),
+                        style:
+                            TextStyle(fontSize: 13, color: Color(0xFF0F0F0F)),
                       )),
                       SizedBox(width: 10),
                     ]),
