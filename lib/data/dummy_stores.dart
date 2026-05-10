@@ -7,7 +7,7 @@ const dummyStores = [
     address: '120 Main Boulevard, Saddar, Rawalpindi',
     latitude: 33.6075,
     longitude: 73.0014,
-    phone: '+92 51 1234567',
+    phone: '+923435235424',
   ),
   Store(
     id: 's2',
@@ -15,7 +15,7 @@ const dummyStores = [
     address: '45 F-11 Markaz, Islamabad',
     latitude: 33.6920,
     longitude: 73.0520,
-    phone: '+92 51 7654321',
+    phone: '+923215897477',
   ),
   Store(
     id: 's3',
@@ -23,6 +23,6 @@ const dummyStores = [
     address: '82 G-10 Markaz, Islamabad',
     latitude: 33.6848,
     longitude: 73.0479,
-    phone: '+92 51 9876543',
+    phone: '+923325664504',
   ),
 ];

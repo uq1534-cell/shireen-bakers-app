@@ -125,7 +125,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'YOUER EMAIL',
+                hintText: 'YOUR EMAIL',
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),

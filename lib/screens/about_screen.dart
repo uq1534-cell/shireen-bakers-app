@@ -155,13 +155,13 @@ class AboutScreen extends StatelessWidget {
               context,
               'Rawalpindi Branch',
               'Main Street, Rawalpindi',
-              '+92-51-XXXXXXX',
+              '+923325664504',
             ),
             _buildLocation(
               context,
               'Islamabad Branch',
               'Blue Area, Islamabad',
-              '+92-51-YYYYYYY',
+              '+923215897477',
             ),
 
             const SizedBox(height: 24),
@@ -181,11 +181,11 @@ class AboutScreen extends StatelessWidget {
               children: [
                 _buildContactIcon(
                   Icons.phone,
-                  '+92-51-XXXXXXX',
+                  '+923325664504',
                 ),
                 _buildContactIcon(
                   Icons.email,
-                  'info@shireenbakers.com',
+                  '[EMAIL_ADDRESS]',
                 ),
               ],
             ),
