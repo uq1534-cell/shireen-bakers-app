@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/splash_screen.dart';
-import '../screens/home_screen.dart';
+import '../widgets/main_scaffold.dart';
 import '../screens/categories_screen.dart';
 import '../screens/cart_screen.dart';
 import '../screens/account_screen.dart';
@@ -36,7 +36,7 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> routes = {
     splash: (_) => const SplashScreen(),
-    home: (_) => const HomeScreen(),
+    home: (_) => const MainScaffold(),
     categories: (_) => const CategoriesScreen(),
     cart: (_) => const CartScreen(),
     account: (_) => const AccountScreen(),
