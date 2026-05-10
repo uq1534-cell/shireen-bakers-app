@@ -82,18 +82,18 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             _buildContactCard(
               icon: Icons.phone_outlined,
               title: 'Phone',
-              content: '+92-51-XXXXXXX',
+              content: '+923325664504',
               onTap: () {},
             ),
             _buildContactCard(
               icon: Icons.email_outlined,
               title: 'Email',
-              content: 'info@shireenbakers.com',
+              content: 'uq1534@gmail.com',
               onTap: () {},
             ),
             _buildContactCard(
               icon: Icons.location_on_outlined,
-              title: 'Address',
+              title: 'J376+9G2, Iqbal Rd, Naya Mohalla, Rawalpindi, 46000',
               content: 'Rawalpindi, Pakistan',
               onTap: () {},
             ),
@@ -125,7 +125,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'Your Email',
+                hintText: 'YOUER EMAIL',
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),

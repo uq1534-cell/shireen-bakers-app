@@ -96,14 +96,14 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5EDD8),
+        backgroundColor: const Color(0xFFFAF4D3),
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
           'My Cart',
           style: TextStyle(
-            color:         Color(0xFF5A3E1B),
+            color:         Color(0xFF757575),
             fontWeight:    FontWeight.w800,
             fontSize:      18,
             letterSpacing: 0.4,
@@ -111,7 +111,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
-          child: Container(height: 2, color: const Color(0xFFC8892A)),
+          child: Container(height: 2, color: const Color(0xFFE6BC15)),
         ),
       ),
       body: Consumer<CartProvider>(

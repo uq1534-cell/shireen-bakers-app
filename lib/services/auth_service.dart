@@ -20,12 +20,33 @@ class AuthService {
     String email,
     String phone,
     String password,
-  ) {
-    return _client.auth.signUp(
+  ) async {
+    // Do NOT pass 'data' metadata here — on Flutter Web, Supabase encodes
+    // metadata into an HTTP header which throws:
+    //   "String contains non ISO-8859-1 code point"
+    // Instead we write the profile row separately after auth succeeds.
+    final response = await _client.auth.signUp(
       email: email.trim(),
       password: password,
-      data: {'name': name.trim(), 'phone': phone.trim()},
     );
+
+    // If signup succeeded and we have a user ID, upsert the profile row.
+    final uid = response.user?.id;
+    if (uid != null) {
+      try {
+        await _client.from('users').upsert({
+          'id': uid,
+          'name': name.trim(),
+          'email': email.trim(),
+          'phone': phone.trim(),
+          'address': '',
+        });
+      } catch (_) {
+        // Profile write failure is non-fatal — auth still succeeded.
+      }
+    }
+
+    return response;
   }
 
   Future<void> signOut() => _client.auth.signOut();

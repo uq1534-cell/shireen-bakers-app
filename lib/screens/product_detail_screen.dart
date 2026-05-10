@@ -26,8 +26,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Details'),
+        backgroundColor: const Color(0xFFFAF4D3),
         elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF757575)),
+        title: const Text(
+          'Product Details',
+          style: TextStyle(
+            color: Color(0xFF757575),
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: Container(height: 2, color: const Color(0xFFE6BC15)),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -76,7 +89,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         'Rs. ${product.price}',
                         style:
                             Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  color: AppColors.primary,
+                                  color: const Color(0xFFE6BC15),
                                   fontWeight: FontWeight.bold,
                                 ),
                       ),

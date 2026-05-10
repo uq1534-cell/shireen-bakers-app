@@ -8,7 +8,7 @@ class BottomNavBar extends StatelessWidget {
 
   const BottomNavBar({super.key, this.currentIndex = 0, this.onTap});
 
-  static const _active   = Color(0xFFC8892A); // golden brown
+  static const _active   = Color(0xFFE6BC15); // website gold
   static const _inactive = Color(0xFF9E9E9E); // muted grey
 
   @override
@@ -19,9 +19,9 @@ class BottomNavBar extends StatelessWidget {
 
         return Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: Color(0xFFFAF4D3), // website cream
             border: Border(
-              top: BorderSide(color: Color(0xFFEEEEEE), width: 1),
+              top: BorderSide(color: Color(0xFFE6BC15), width: 1),
             ),
             boxShadow: [
               BoxShadow(
@@ -36,7 +36,7 @@ class BottomNavBar extends StatelessWidget {
             onTap: onTap,
             type: BottomNavigationBarType.fixed,
             elevation: 0,
-            backgroundColor: Colors.white,
+            backgroundColor: const Color(0xFFFAF4D3),
             selectedItemColor: _active,
             unselectedItemColor: _inactive,
             selectedLabelStyle: const TextStyle(

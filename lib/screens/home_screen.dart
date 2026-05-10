@@ -278,7 +278,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
     required this.onMenuTap,
   });
 
-  static const double _h = 104;
+  static const double _h = 116;
 
   @override double get minExtent => _h;
   @override double get maxExtent => _h;
@@ -294,10 +294,10 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
         return Container(
           height: _h,
           decoration: const BoxDecoration(
-            color: Color(0xFFF5EDD8),
-            border: Border(bottom: BorderSide(color: Color(0xFFC8892A), width: 2)),
+            color: Color(0xFFFAF4D3), // website cream background
+            border: Border(bottom: BorderSide(color: Color(0xFFE6BC15), width: 2.5)),
             boxShadow: [BoxShadow(
-              color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, 3))],
+              color: Color(0x18000000), blurRadius: 10, offset: Offset(0, 3))],
           ),
           child: SafeArea(
             bottom: false,
@@ -319,17 +319,43 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                         constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                       )),
 
-                      // Logo
+                      // Logo + brand name stacked
                       Expanded(child: Center(
-                        child: Image.asset(
-                          'assets/images/logo_transparent.png',
-                          height: 38, fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const Text(
-                            'SHIREEN BAKERS',
-                            style: TextStyle(fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF5A3E1B)),
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo_transparent.png',
+                              height: 34, fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.cake_rounded,
+                                color: Color(0xFFE6BC15), size: 30,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            RichText(
+                              text: const TextSpan(children: [
+                                TextSpan(
+                                  text: 'SHIREEN ',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF757575),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'BAKERS',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFFE6BC15),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ],
                         ),
                       )),
 
@@ -343,8 +369,8 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                               horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             color: loggedIn
-                                ? AppColors.primary
-                                : const Color(0xFF3B2B1A),
+                                ? const Color(0xFFE6BC15)
+                                : const Color(0xFF757575),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -365,7 +391,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                           const Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(Icons.shopping_cart_outlined,
-                                color: Color(0xFF5A3E1B), size: 25),
+                                color: Color(0xFF0F0F0F), size: 25),
                           ),
                           if (count > 0)
                             Positioned(
@@ -373,7 +399,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                               child: Container(
                                 padding: const EdgeInsets.all(3),
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFC8892A),
+                                  color: Color(0xFFE6BC15),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text('$count',
@@ -397,7 +423,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                          color: const Color(0xFFE8D5B5), width: 1.5),
+                          color: const Color(0xFFE6BC15), width: 1.5),
                       boxShadow: [BoxShadow(
                         color: Colors.black.withValues(alpha: 0.07),
                         blurRadius: 6, offset: const Offset(0, 2),
@@ -406,19 +432,19 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
                     child: Row(children: const [
                       SizedBox(width: 14),
                       Icon(Icons.search_rounded,
-                          color: Color(0xFFC8892A), size: 20),
+                          color: Color(0xFFE6BC15), size: 20),
                       SizedBox(width: 8),
                       Expanded(child: TextField(
                         decoration: InputDecoration(
                           hintText: 'Search for cakes, bread, pastries...',
                           hintStyle: TextStyle(
-                              color: Color(0xFFAA9070), fontSize: 13),
+                              color: Color(0xFF9E9E9E), fontSize: 13),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
                         style: TextStyle(
-                            fontSize: 13, color: Color(0xFF5A3E1B)),
+                            fontSize: 13, color: Color(0xFF0F0F0F)),
                       )),
                       SizedBox(width: 10),
                     ]),

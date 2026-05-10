@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../config/app_colors.dart';
 import '../data/dummy_categories.dart';
 import '../data/dummy_products.dart';
+import '../models/product.dart';
+import '../providers/cart_provider.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -11,248 +14,243 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  String? _selectedCategory;
+  /// null = show category grid; non-null = show products for that category
+  Category? _selectedCategory;
 
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  List<Product> get _filteredProducts => _selectedCategory == null
+      ? []
+      : dummyProducts
+          .where((p) => p.categoryId == _selectedCategory!.id)
+          .toList();
+
+  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final selectedProducts = _selectedCategory == null
-        ? dummyProducts
-        : dummyProducts
-            .where((p) => p.categoryId == _selectedCategory)
-            .toList();
-
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5EDD8),
+        backgroundColor: const Color(0xFFFAF4D3),
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Categories',
-          style: TextStyle(
-            color:         Color(0xFF5A3E1B),
-            fontWeight:    FontWeight.w800,
-            fontSize:      18,
+        leading: _selectedCategory != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Color(0xFF757575)),
+                onPressed: () => setState(() => _selectedCategory = null),
+              )
+            : null,
+        title: Text(
+          _selectedCategory != null ? _selectedCategory!.name : 'Categories',
+          style: const TextStyle(
+            color: Color(0xFF757575),
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
             letterSpacing: 0.4,
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
-          child: Container(height: 2, color: const Color(0xFFC8892A)),
+          child: Container(height: 2, color: const Color(0xFFE6BC15)),
         ),
       ),
-      body: Column(
-        children: [
-          // Category Selector
-          SizedBox(
-            height: 100,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: List.generate(
-                  dummyCategories.length + 1,
-                  (index) {
-                    if (index == 0) {
-                      // All Categories option
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() => _selectedCategory = null);
-                          },
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 70,
-                                width: 70,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: _selectedCategory == null
-                                        ? AppColors.accent
-                                        : AppColors.border,
-                                    width: _selectedCategory == null ? 3 : 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: AppColors.cardBg,
-                                  boxShadow: _selectedCategory == null
-                                      ? [
-                                          BoxShadow(
-                                            color: AppColors.accent
-                                                .withValues(alpha: 0.3),
-                                            blurRadius: 8,
-                                            spreadRadius: 1,
-                                          ),
-                                        ]
-                                      : [],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.apps,
-                                    color: AppColors.primary,
-                                    size: 32,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const SizedBox(
-                                width: 70,
-                                child: Text(
-                                  'All',
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    final category = dummyCategories[index - 1];
-                    final isSelected = _selectedCategory == category.id;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() => _selectedCategory = category.id);
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 70,
-                              width: 70,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.accent
-                                      : AppColors.border,
-                                  width: isSelected ? 3 : 2,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                color: AppColors.cardBg,
-                                boxShadow: isSelected
-                                    ? [
-                                        BoxShadow(
-                                          color:
-                                              AppColors.accent.withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          spreadRadius: 1,
-                                        ),
-                                      ]
-                                    : [],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  category.imageUrl,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            SizedBox(
-                              width: 70,
-                              child: Text(
-                                category.name,
-                                maxLines: 2,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.textDark,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
-
-          // Products Grid
-          Expanded(
-            child: selectedProducts.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_basket_outlined,
-                          size: 80,
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No products found',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ],
-                    ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.all(12),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemCount: selectedProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = selectedProducts[index];
-                      return _buildProductCard(context, product);
-                    },
-                  ),
-          ),
-        ],
-      ),
+      body: _selectedCategory == null
+          ? _buildCategoryGrid()
+          : _buildProductGrid(),
     );
   }
 
-  Widget _buildProductCard(BuildContext context, dynamic product) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/product-detail',
-          arguments: product.id,
+  // ── Category 2-Column Grid ────────────────────────────────────────────────
+  Widget _buildCategoryGrid() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount:   2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing:  10,
+        childAspectRatio: 0.88, // slightly taller than square for label
+      ),
+      itemCount: dummyCategories.length,
+      itemBuilder: (context, index) {
+        final cat = dummyCategories[index];
+        return _CategoryCard(
+          category: cat,
+          onTap: () => setState(() => _selectedCategory = cat),
         );
       },
-      child: Card(
+    );
+  }
+
+  // ── Filtered Products Grid ────────────────────────────────────────────────
+  Widget _buildProductGrid() {
+    final products = _filteredProducts;
+
+    if (products.isEmpty) {
+      return Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Product Image
+            Icon(Icons.shopping_basket_outlined,
+                size: 80,
+                color: const Color(0xFFE6BC15).withValues(alpha: 0.5)),
+            const SizedBox(height: 16),
+            Text(
+              'No products in this category yet',
+              style: TextStyle(
+                  fontSize: 16, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount:   2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing:  10,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        return _ProductCard(product: product);
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Category Card — matches the reference image (large image + bold name)
+// ─────────────────────────────────────────────────────────────────────────────
+class _CategoryCard extends StatelessWidget {
+  final Category category;
+  final VoidCallback onTap;
+
+  const _CategoryCard({required this.category, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Category image — takes up ~75% of card height
             Expanded(
-              child: Container(
-                color: AppColors.surfaceColor,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: Image.asset(
-                    product.imageUrl,
-                    fit: BoxFit.cover,
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft:  Radius.circular(4),
+                  topRight: Radius.circular(4),
+                ),
+                child: Image.asset(
+                  category.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: const Color(0xFFF0ECD8),
+                    child: const Icon(Icons.bakery_dining,
+                        color: Color(0xFFE6BC15), size: 48),
                   ),
                 ),
               ),
             ),
 
-            // Product Info
+            // Bold uppercase name
+            Expanded(
+              flex: 1,
+              child: Container(
+                color: Colors.white,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  category.name.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize:      13,
+                    fontWeight:    FontWeight.w800,
+                    color:         Color(0xFF0F0F0F),
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Product Card — shown after tapping a category
+// ─────────────────────────────────────────────────────────────────────────────
+class _ProductCard extends StatelessWidget {
+  final Product product;
+  const _ProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = context.read<CartProvider>();
+
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(
+        context,
+        '/product-detail',
+        arguments: product.id,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color:        Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color:      Colors.black.withValues(alpha: 0.07),
+              blurRadius: 8,
+              offset:     const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Product image
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft:  Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+                child: Image.asset(
+                  product.imageUrl,
+                  fit:   BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: const Color(0xFFF0ECD8),
+                    child: const Icon(Icons.image_not_supported,
+                        color: AppColors.accent),
+                  ),
+                ),
+              ),
+            ),
+
+            // Name + price + add button
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
@@ -262,18 +260,46 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     product.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize:   13,
+                      color:      Color(0xFF0F0F0F),
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Rs. ${product.price}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Rs. ${product.price}',
+                        style: const TextStyle(
+                          color:      Color(0xFFE6BC15),
+                          fontWeight: FontWeight.w800,
+                          fontSize:   13,
                         ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          cart.addItem(product);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${product.name} added to cart'),
+                              duration: const Duration(seconds: 1),
+                              backgroundColor: const Color(0xFFE6BC15),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color:     Color(0xFFE6BC15),
+                            shape:     BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.add,
+                              color: Colors.white, size: 16),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

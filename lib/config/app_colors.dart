@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Colors - Golden theme from website
-  static const primary = Color(0xFFC8892A); // Golden Brown
-  static const accent = Color(0xFFFFC700); // Golden Yellow
-  static const primaryDark = Color(0xFF8B6914);
+  // ── Brand palette — matched exactly to shireen-bakers.com ────────────────
+  static const primary     = Color(0xFF757575); // Charcoal grey (SHIREEN text, buttons)
+  static const accent      = Color(0xFFE6BC15); // Vibrant gold  (BAKERS text, S icon)
+  static const primaryDark = Color(0xFF505050); // Darker charcoal
 
-  // Background Colors
-  static const surfaceColor = Color(0xFFFDF8F2); // Warm white/cream
-  static const cardBg = Color(0xFFFFFFFF); // Pure white
-  static const darkBg = Color(0xFF2A2A2A); // Dark for hero sections
+  // ── Backgrounds ──────────────────────────────────────────────────────────
+  static const surfaceColor = Color(0xFFFAF4D3); // Warm cream (page bg)
+  static const cardBg       = Color(0xFFFFFFFF); // Pure white (cards)
+  static const darkBg       = Color(0xFF2A2A2A); // Dark sections
 
-  // Text Colors
-  static const textDark = Color(0xFF1A1A1A); // Dark text
-  static const textLight = Color(0xFF888888); // Light gray text
-  static const textWhite = Color(0xFFFFFFFF); // White text
+  // ── Text ─────────────────────────────────────────────────────────────────
+  static const textDark  = Color(0xFF0F0F0F); // Near-black (nav links, body)
+  static const textLight = Color(0xFF757575); // Charcoal grey (secondary text)
+  static const textWhite = Color(0xFFFFFFFF); // White text on dark bg
 
-  // Borders & Dividers
-  static const border = Color(0xFFE8D5B5); // Light golden border
-  static const divider = Color(0xFFE0E0E0); // Gray divider
+  // ── Borders & Dividers ───────────────────────────────────────────────────
+  static const border  = Color(0xFFE0D5A3); // Cream-tinted border
+  static const divider = Color(0xFFE0E0E0); // Light grey divider
 
-  // Status Colors
-  static const success = Color(0xFF4CAF50); // Green
-  static const warning = Color(0xFFFF9800); // Orange
-  static const error = Color(0xFFF44336); // Red
-  static const info = Color(0xFF2196F3); // Blue
+  // ── Status ───────────────────────────────────────────────────────────────
+  static const success = Color(0xFF4CAF50);
+  static const warning = Color(0xFFFF9800);
+  static const error   = Color(0xFFF44336);
+  static const info    = Color(0xFF2196F3);
 }
