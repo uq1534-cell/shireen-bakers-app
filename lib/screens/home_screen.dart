@@ -221,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const navItems = [
       ('HOME', '/'),
       ('MENU', '/categories'),
+      ('TRACK ORDER', '/track-order'),
       ('LOCATIONS', '/store-locator'),
       ('ABOUT US', '/about'),
       ('FEEDBACK', '/feedback'),

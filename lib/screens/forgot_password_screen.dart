@@ -50,10 +50,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot Password')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text('Forgot Password'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-        child: _emailSent ? _buildSuccessView(context) : _buildFormView(context),
+        child:
+            _emailSent ? _buildSuccessView(context) : _buildFormView(context),
       ),
     );
   }
@@ -164,7 +171,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
+            onPressed: () =>
+                Navigator.of(context).pushReplacementNamed('/login'),
             child: const Text('Back to Sign In'),
           ),
         ),

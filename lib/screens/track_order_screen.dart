@@ -31,6 +31,10 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text('Track Your Order'),
         elevation: 0,
       ),
@@ -274,7 +278,8 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              border:
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -436,9 +441,8 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                   Container(
                     height: 60,
                     width: 2,
-                    color: step.isCompleted
-                        ? AppColors.success
-                        : AppColors.border,
+                    color:
+                        step.isCompleted ? AppColors.success : AppColors.border,
                   ),
               ],
             ),
@@ -451,10 +455,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                   children: [
                     Text(
                       step.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: step.isCompleted || step.isActive
                                 ? AppColors.textDark
@@ -480,8 +481,18 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
   String _formatDate(DateTime dt) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     final h = dt.hour > 12 ? dt.hour - 12 : dt.hour;
     final ampm = dt.hour >= 12 ? 'PM' : 'AM';

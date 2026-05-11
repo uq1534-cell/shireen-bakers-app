@@ -99,13 +99,17 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: const Color(0xFFFAF4D3),
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Color(0xFF757575)),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text(
           'My Cart',
           style: TextStyle(
-            color:         Color(0xFF757575),
-            fontWeight:    FontWeight.w800,
-            fontSize:      18,
+            color: Color(0xFF757575),
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
             letterSpacing: 0.4,
           ),
         ),
@@ -399,9 +403,8 @@ class _CartScreenState extends State<CartScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isCheckingOut
-                            ? null
-                            : () => _handleCheckout(cart),
+                        onPressed:
+                            _isCheckingOut ? null : () => _handleCheckout(cart),
                         child: _isCheckingOut
                             ? const SizedBox(
                                 height: 20,
