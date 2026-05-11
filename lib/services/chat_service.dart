@@ -9,7 +9,11 @@ class ChatService {
   static final List<Map<String, dynamic>> _history = [];
 
   static Future<String> sendMessage(String userMessage) async {
-    final apiKey = dotenv.env['GEMINI_API_KEY']!;
+    final apiKey = dotenv.env['GEMINI_API_KEY'];
+
+    if (apiKey == null || apiKey.isEmpty) {
+      return 'Error: GEMINI_API_KEY not configured. Please check your .env file.';
+    }
 
     _history.add({
       'role': 'user',

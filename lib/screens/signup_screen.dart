@@ -85,8 +85,22 @@ class _SignupScreenState extends State<SignupScreen> {
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
       if (!mounted) return;
+
+      String errorMsg = e.toString();
+
+      // Better error messages for common issues
+      if (errorMsg.contains('over_email_send_rate_limit') ||
+          errorMsg.contains('rate limit')) {
+        errorMsg =
+            'Too many signup attempts. Please wait 15 minutes or try a different email.';
+      } else if (errorMsg.contains('already registered')) {
+        errorMsg = 'This email is already registered. Try logging in instead.';
+      } else if (errorMsg.contains('invalid_credentials')) {
+        errorMsg = 'Invalid email or password.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(content: Text(errorMsg), duration: const Duration(seconds: 5)),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -193,8 +207,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 Checkbox(
                   value: _agreedToTerms,
-                  onChanged: (v) =>
-                      setState(() => _agreedToTerms = v ?? false),
+                  onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
                 ),
                 Expanded(
                   child: GestureDetector(

@@ -111,7 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildCategoryItem(
                       dummyCategories[i],
                       i == _selectedCategoryIndex,
-                      () => setState(() => _selectedCategoryIndex = i),
+                      () => Navigator.pushNamed(
+                        context,
+                        '/categories',
+                        arguments: dummyCategories[i],
+                      ),
                     ),
                   ),
                 ),

@@ -7,7 +7,8 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 
 class CategoriesScreen extends StatefulWidget {
-  const CategoriesScreen({super.key});
+  final dynamic initialCategory;
+  const CategoriesScreen({super.key, this.initialCategory});
 
   @override
   State<CategoriesScreen> createState() => _CategoriesScreenState();
@@ -15,7 +16,13 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   /// null = show category grid; non-null = show products for that category
-  Category? _selectedCategory;
+  late Category? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = widget.initialCategory;
+  }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
   List<Product> get _filteredProducts => _selectedCategory == null
@@ -33,14 +40,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         backgroundColor: const Color(0xFFFAF4D3),
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false,
-        leading: _selectedCategory != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Color(0xFF757575)),
-                onPressed: () => setState(() => _selectedCategory = null),
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Color(0xFF757575)),
+          onPressed: () {
+            if (_selectedCategory != null) {
+              // If viewing products, go back to category grid
+              setState(() => _selectedCategory = null);
+            } else {
+              // If viewing category grid, go back to home
+              Navigator.pop(context);
+            }
+          },
+        ),
         title: Text(
           _selectedCategory != null ? _selectedCategory!.name : 'Categories',
           style: const TextStyle(
@@ -66,9 +78,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
+        crossAxisCount: 2,
         crossAxisSpacing: 10,
-        mainAxisSpacing:  10,
+        mainAxisSpacing: 10,
         childAspectRatio: 0.88, // slightly taller than square for label
       ),
       itemCount: dummyCategories.length,
@@ -97,8 +109,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             const SizedBox(height: 16),
             Text(
               'No products in this category yet',
-              style: TextStyle(
-                  fontSize: 16, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -108,9 +119,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
+        crossAxisCount: 2,
         crossAxisSpacing: 10,
-        mainAxisSpacing:  10,
+        mainAxisSpacing: 10,
         childAspectRatio: 0.75,
       ),
       itemCount: products.length,
@@ -155,7 +166,7 @@ class _CategoryCard extends StatelessWidget {
               flex: 3,
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  topLeft:  Radius.circular(4),
+                  topLeft: Radius.circular(4),
                   topRight: Radius.circular(4),
                 ),
                 child: Image.asset(
@@ -183,9 +194,9 @@ class _CategoryCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize:      13,
-                    fontWeight:    FontWeight.w800,
-                    color:         Color(0xFF0F0F0F),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F0F0F),
                     letterSpacing: 0.8,
                   ),
                 ),
@@ -217,13 +228,13 @@ class _ProductCard extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color:        Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color:      Colors.black.withValues(alpha: 0.07),
+              color: Colors.black.withValues(alpha: 0.07),
               blurRadius: 8,
-              offset:     const Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -234,12 +245,12 @@ class _ProductCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  topLeft:  Radius.circular(8),
+                  topLeft: Radius.circular(8),
                   topRight: Radius.circular(8),
                 ),
                 child: Image.asset(
                   product.imageUrl,
-                  fit:   BoxFit.cover,
+                  fit: BoxFit.cover,
                   width: double.infinity,
                   errorBuilder: (_, __, ___) => Container(
                     color: const Color(0xFFF0ECD8),
@@ -262,8 +273,8 @@ class _ProductCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize:   13,
-                      color:      Color(0xFF0F0F0F),
+                      fontSize: 13,
+                      color: Color(0xFF0F0F0F),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -273,9 +284,9 @@ class _ProductCard extends StatelessWidget {
                       Text(
                         'Rs. ${product.price}',
                         style: const TextStyle(
-                          color:      Color(0xFFE6BC15),
+                          color: Color(0xFFE6BC15),
                           fontWeight: FontWeight.w800,
-                          fontSize:   13,
+                          fontSize: 13,
                         ),
                       ),
                       GestureDetector(
@@ -292,8 +303,8 @@ class _ProductCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: const BoxDecoration(
-                            color:     Color(0xFFE6BC15),
-                            shape:     BoxShape.circle,
+                            color: Color(0xFFE6BC15),
+                            shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.add,
                               color: Colors.white, size: 16),

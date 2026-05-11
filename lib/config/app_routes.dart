@@ -39,7 +39,10 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     splash: (_) => const SplashScreen(),
     home: (_) => const MainScaffold(),
-    categories: (_) => const CategoriesScreen(),
+    categories: (context) {
+      final category = ModalRoute.of(context)?.settings.arguments;
+      return CategoriesScreen(initialCategory: category);
+    },
     cart: (_) => const CartScreen(),
     account: (_) => const AccountScreen(),
     login: (_) => const LoginScreen(),

@@ -11,19 +11,16 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late final ChatService _chatService;
   late final TextEditingController _messageController;
   late final ScrollController _scrollController;
-  late List<ChatMessage> _messages;
+  final List<ChatMessage> _messages = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _chatService = ChatService();
     _messageController = TextEditingController();
     _scrollController = ScrollController();
-    _messages = _chatService.getConversationHistory();
 
     // Add initial greeting if no messages exist
     if (_messages.isEmpty) {
@@ -73,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollToBottom();
 
     try {
-      final response = await _chatService.sendMessage(text);
+      final response = await ChatService.sendMessage(text);
 
       if (!mounted) return;
 
