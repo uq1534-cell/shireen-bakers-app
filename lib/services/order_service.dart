@@ -13,44 +13,51 @@ class OrderService {
     double total,
     String address,
   ) async {
-    // 1. Insert the order row
-    final orderRow = await _client
-        .from('orders')
-        .insert({
-          'user_id': userId,
-          'total_price': total,
-          'delivery_address': address,
-          'status': 'confirmed',
-        })
-        .select()
-        .single();
+    try {
+      // 1. Insert the order row
+      final orderRow = await _client
+          .from('orders')
+          .insert({
+            'user_id': userId,
+            'total_price': total,
+            'delivery_address': address,
+            'status': 'confirmed',
+          })
+          .select()
+          .single();
 
-    final orderId = orderRow['id'] as String;
+      final orderId = orderRow['id'] as String;
 
-    // 2. Insert order_items
-    final itemRows = items
-        .map(
-          (item) => {
-            'order_id': orderId,
-            'product_id': item.product.id,
-            'product_name': item.product.name,
-            'quantity': item.quantity,
-            'price': item.product.price,
-          },
-        )
-        .toList();
+      // 2. Insert order_items
+      final itemRows = items
+          .map(
+            (item) => {
+              'order_id': orderId,
+              'product_id': item.product.id,
+              'product_name': item.product.name,
+              'quantity': item.quantity,
+              'price': item.product.price,
+            },
+          )
+          .toList();
 
-    await _client.from('order_items').insert(itemRows);
+      if (itemRows.isNotEmpty) {
+        await _client.from('order_items').insert(itemRows);
+      }
 
-    // 3. Return hydrated Order model
-    return Order(
-      id: orderId,
-      items: items,
-      total: total,
-      status: OrderStatus.confirmed,
-      createdAt: DateTime.parse(orderRow['created_at'] as String),
-      deliveryAddress: address,
-    );
+      // 3. Return hydrated Order model
+      return Order(
+        id: orderId,
+        items: items,
+        total: total,
+        status: OrderStatus.confirmed,
+        createdAt: DateTime.parse(orderRow['created_at'] as String),
+        deliveryAddress: address,
+      );
+    } catch (e) {
+      print('Error placing order: $e');
+      rethrow;
+    }
   }
 
   /// Fetch all orders for [userId] with their items, newest first.

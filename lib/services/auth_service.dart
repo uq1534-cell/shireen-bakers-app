@@ -32,17 +32,31 @@ class AuthService {
 
     // If signup succeeded and we have a user ID, upsert the profile row.
     final uid = response.user?.id;
-    if (uid != null) {
+    if (uid != null && uid.isNotEmpty) {
       try {
-        await _client.from('users').upsert({
+        await _client.from('users').insert({
           'id': uid,
           'name': name.trim(),
           'email': email.trim(),
           'phone': phone.trim(),
           'address': '',
+          'created_at': DateTime.now().toIso8601String(),
         });
-      } catch (_) {
-        // Profile write failure is non-fatal — auth still succeeded.
+      } catch (e) {
+        // Profile write failure — log it but don't fail auth
+        print('Error inserting user profile: $e');
+
+        // Try update if insert fails (in case row exists)
+        try {
+          await _client.from('users').update({
+            'name': name.trim(),
+            'email': email.trim(),
+            'phone': phone.trim(),
+            'address': '',
+          }).eq('id', uid);
+        } catch (updateError) {
+          print('Error updating user profile: $updateError');
+        }
       }
     }
 
@@ -58,11 +72,8 @@ class AuthService {
 
   /// Fetch the user's profile row from `public.users`.
   Future<app.User?> fetchUserProfile(String userId) async {
-    final data = await _client
-        .from('users')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
+    final data =
+        await _client.from('users').select().eq('id', userId).maybeSingle();
 
     if (data == null) return null;
 
