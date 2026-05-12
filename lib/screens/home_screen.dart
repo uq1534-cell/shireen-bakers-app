@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../config/app_colors.dart';
 import '../data/dummy_categories.dart';
 import '../data/dummy_products.dart';
+import '../models/product.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/product_card.dart';
@@ -18,6 +19,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
+  final _searchController = TextEditingController();
+  List<Product> _searchResults = [];
+  bool _showSearchResults = false;
 
   final List<String> _banners = const [
     'assets/images/main.png',
@@ -25,6 +29,135 @@ class _HomeScreenState extends State<HomeScreen> {
     'assets/images/promo_cakes.png',
     'assets/images/promo_gifts.png',
   ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _performSearch(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _showSearchResults = false;
+      });
+      return;
+    }
+
+    final results = dummyProducts
+        .where((p) =>
+            p.name.toLowerCase().contains(query.toLowerCase()) ||
+            p.description.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    setState(() {
+      _searchResults = results;
+      _showSearchResults = true;
+    });
+
+    // Auto-navigate if only 1 result
+    if (results.length == 1) {
+      _navigateToProduct(results[0]);
+    }
+  }
+
+  void _navigateToProduct(Product product) {
+    _searchController.clear();
+    setState(() {
+      _searchResults = [];
+      _showSearchResults = false;
+    });
+    Navigator.pushNamed(context, '/product-detail', arguments: product.id);
+  }
+
+  void _showSearchResults() {
+    if (_searchResults.isEmpty) return;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: _searchResults.length,
+          itemBuilder: (context, index) {
+            final product = _searchResults[index];
+            return InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                _navigateToProduct(product);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        product.imageUrl,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            product.description,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'PKR ${product.price.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFC8892A),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +178,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onCartTap: () => widget.onSwitchTab?.call(3),
               onLoginTap: () => Navigator.pushNamed(context, '/login'),
               onMenuTap: (ctx) => Scaffold.of(ctx).openDrawer(),
+              searchController: _searchController,
+              onSearch: _performSearch,
+              searchResults: _searchResults,
+              showResults: _showSearchResults,
+              onProductTap: _navigateToProduct,
             ),
           ),
 
@@ -304,11 +442,21 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
   final VoidCallback onCartTap;
   final VoidCallback onLoginTap;
   final void Function(BuildContext) onMenuTap;
+  final TextEditingController searchController;
+  final Function(String) onSearch;
+  final List<Product> searchResults;
+  final bool showResults;
+  final Function(Product) onProductTap;
 
   const _CompactSearchHeader({
     required this.onCartTap,
     required this.onLoginTap,
     required this.onMenuTap,
+    required this.searchController,
+    required this.onSearch,
+    required this.searchResults,
+    required this.showResults,
+    required this.onProductTap,
   });
 
   static const double _h = 116;
@@ -318,7 +466,9 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent => _h;
   @override
-  bool shouldRebuild(covariant _CompactSearchHeader old) => false;
+  bool shouldRebuild(covariant _CompactSearchHeader old) =>
+      old.searchResults.length != searchResults.length ||
+      old.showResults != showResults;
 
   @override
   Widget build(BuildContext ctx, double shrinkOffset, bool overlaps) {
@@ -330,7 +480,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
         return Container(
           height: _h,
           decoration: const BoxDecoration(
-            color: Color(0xFFFAF4D3), // website cream background
+            color: Color(0xFFFAF4D3),
             border: Border(
                 bottom: BorderSide(color: Color(0xFFE6BC15), width: 2.5)),
             boxShadow: [
@@ -343,167 +493,197 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
           child: SafeArea(
             bottom: false,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Row 1 — hamburger | logo | login + cart
-                SizedBox(
-                  height: 54,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(children: [
-                      // Hamburger
-                      Builder(
-                          builder: (bCtx) => IconButton(
-                                onPressed: () => onMenuTap(bCtx),
-                                icon: const Icon(Icons.menu_rounded,
-                                    color: Color(0xFF5A3E1B), size: 26),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(
-                                    minWidth: 36, minHeight: 36),
-                              )),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Row 1 — hamburger | logo | login + cart
+                    SizedBox(
+                      height: 54,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(children: [
+                          // Hamburger
+                          Builder(
+                              builder: (bCtx) => IconButton(
+                                    onPressed: () => onMenuTap(bCtx),
+                                    icon: const Icon(Icons.menu_rounded,
+                                        color: Color(0xFF5A3E1B), size: 26),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                        minWidth: 36, minHeight: 36),
+                                  )),
 
-                      // Logo + brand name stacked
-                      Expanded(
-                          child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/images/logo_transparent.png',
-                              height: 34,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => const Icon(
-                                Icons.cake_rounded,
-                                color: Color(0xFFE6BC15),
-                                size: 30,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            RichText(
-                              text: const TextSpan(children: [
-                                TextSpan(
-                                  text: 'SHIREEN ',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF757575),
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'BAKERS',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
+                          // Logo + brand name stacked
+                          Expanded(
+                              child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/logo_transparent.png',
+                                  height: 34,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.cake_rounded,
                                     color: Color(0xFFE6BC15),
-                                    letterSpacing: 1.5,
+                                    size: 30,
                                   ),
                                 ),
-                              ]),
-                            ),
-                          ],
-                        ),
-                      )),
-
-                      // Login / Account pill
-                      GestureDetector(
-                        onTap: loggedIn
-                            ? () => Navigator.pushNamed(context, '/account')
-                            : onLoginTap,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: loggedIn
-                                ? const Color(0xFFE6BC15)
-                                : const Color(0xFF757575),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            loggedIn ? 'Account' : 'Login',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      // Cart icon + badge
-                      GestureDetector(
-                        onTap: onCartTap,
-                        child: Stack(clipBehavior: Clip.none, children: [
-                          const Padding(
-                            padding: EdgeInsets.all(4),
-                            child: Icon(Icons.shopping_cart_outlined,
-                                color: Color(0xFF0F0F0F), size: 25),
-                          ),
-                          if (count > 0)
-                            Positioned(
-                              top: -2,
-                              right: -2,
-                              child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFE6BC15),
-                                  shape: BoxShape.circle,
+                                const SizedBox(height: 2),
+                                RichText(
+                                  text: const TextSpan(children: [
+                                    TextSpan(
+                                      text: 'SHIREEN ',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFF757575),
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'BAKERS',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFFE6BC15),
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                  ]),
                                 ),
-                                child: Text('$count',
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w700)),
+                              ],
+                            ),
+                          )),
+
+                          // Login / Account pill
+                          GestureDetector(
+                            onTap: loggedIn
+                                ? () => Navigator.pushNamed(context, '/account')
+                                : onLoginTap,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: loggedIn
+                                    ? const Color(0xFFE6BC15)
+                                    : const Color(0xFF757575),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                loggedIn ? 'Account' : 'Login',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700),
                               ),
                             ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // Cart icon + badge
+                          GestureDetector(
+                            onTap: onCartTap,
+                            child: Stack(clipBehavior: Clip.none, children: [
+                              const Padding(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(Icons.shopping_cart_outlined,
+                                    color: Color(0xFF0F0F0F), size: 25),
+                              ),
+                              if (count > 0)
+                                Positioned(
+                                  top: -2,
+                                  right: -2,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFE6BC15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text('$count',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700)),
+                                  ),
+                                ),
+                            ]),
+                          ),
                         ]),
                       ),
-                    ]),
-                  ),
-                ),
-
-                // Row 2 — search bar
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                          color: const Color(0xFFE6BC15), width: 1.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.07),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        )
-                      ],
                     ),
-                    child: Row(children: const [
-                      SizedBox(width: 14),
-                      Icon(Icons.search_rounded,
-                          color: Color(0xFFE6BC15), size: 20),
-                      SizedBox(width: 8),
-                      Expanded(
-                          child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search for cakes, bread, pastries...',
-                          hintStyle:
-                              TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
+
+                    // Row 2 — search bar
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_searchResults.isNotEmpty) {
+                            _showSearchResults();
+                          }
+                        },
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                                color: const Color(0xFFE6BC15), width: 1.5),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    Colors.black.withValues(alpha: 0.07),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              )
+                            ],
+                          ),
+                          child: Row(children: [
+                            const SizedBox(width: 14),
+                            const Icon(Icons.search_rounded,
+                                color: Color(0xFFE6BC15), size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                                child: TextField(
+                              controller: searchController,
+                              onChanged: onSearch,
+                              onSubmitted: (_) {
+                                if (searchResults.isNotEmpty) {
+                                  onProductTap(searchResults[0]);
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                hintText: 'Search for cakes, bread, pastries...',
+                                hintStyle: TextStyle(
+                                    color: Color(0xFF9E9E9E), fontSize: 13),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              style: const TextStyle(
+                                  fontSize: 13, color: Color(0xFF0F0F0F)),
+                            )),
+                            if (searchController.text.isNotEmpty)
+                              GestureDetector(
+                                onTap: () {
+                                  searchController.clear();
+                                  onSearch('');
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.only(right: 8),
+                                  child: Icon(Icons.close,
+                                      color: Color(0xFF9E9E9E), size: 18),
+                                ),
+                              )
+                            else
+                              const SizedBox(width: 10),
+                          ]),
                         ),
-                        style:
-                            TextStyle(fontSize: 13, color: Color(0xFF0F0F0F)),
-                      )),
-                      SizedBox(width: 10),
-                    ]),
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );

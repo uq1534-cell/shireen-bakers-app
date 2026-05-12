@@ -48,8 +48,31 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.of(context).pushReplacementNamed('/');
     } catch (e) {
       if (!mounted) return;
+
+      String errorMsg = e.toString();
+
+      // Better error messages
+      if (errorMsg.contains('invalid_credentials') ||
+          errorMsg.contains('Invalid login credentials')) {
+        errorMsg =
+            'Invalid email or password.\n\nTest Account:\nEmail: umer@gmail.com\nPassword: 123456';
+      } else if (errorMsg.contains('email_not_confirmed')) {
+        errorMsg =
+            'Please confirm your email first. Check your inbox for confirmation link.';
+      } else if (errorMsg.contains('User not found')) {
+        errorMsg =
+            'This email is not registered. Please sign up first or use test account: umer@gmail.com / 123456';
+      } else if (errorMsg.contains('over_email_send_rate_limit') ||
+          errorMsg.contains('rate limit')) {
+        errorMsg = 'Too many login attempts. Please wait a few minutes.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(
+          content: Text(errorMsg),
+          duration: const Duration(seconds: 6),
+          backgroundColor: Colors.red.shade700,
+        ),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);

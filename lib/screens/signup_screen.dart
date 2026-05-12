@@ -45,6 +45,22 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    // Validate email format
+    if (!_isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email address')),
+      );
+      return;
+    }
+
+    // Validate phone format (basic check)
+    if (phone.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid phone number')),
+      );
+      return;
+    }
+
     if (password != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -72,8 +88,6 @@ class _SignupScreenState extends State<SignupScreen> {
       await context.read<AuthProvider>().signup(name, email, phone, password);
       if (!mounted) return;
 
-      // Supabase may require email confirmation depending on your project settings.
-      // Show a confirmation message and let the user log in manually.
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -90,21 +104,39 @@ class _SignupScreenState extends State<SignupScreen> {
 
       // Better error messages for common issues
       if (errorMsg.contains('over_email_send_rate_limit') ||
-          errorMsg.contains('rate limit')) {
+          errorMsg.contains('rate limit') ||
+          errorMsg.contains('429')) {
         errorMsg =
-            'Too many signup attempts. Please wait 15 minutes or try a different email.';
-      } else if (errorMsg.contains('already registered')) {
+            'Too many signup attempts with this email. Please wait 15 minutes, then try again with a different email. Or use the test account: umer@gmail.com / password: 123456';
+      } else if (errorMsg.contains('email_address_invalid')) {
+        errorMsg = 'This email address is invalid. Please check and try again.';
+      } else if (errorMsg.contains('already registered') ||
+          errorMsg.contains('User already exists')) {
         errorMsg = 'This email is already registered. Try logging in instead.';
       } else if (errorMsg.contains('invalid_credentials')) {
         errorMsg = 'Invalid email or password.';
+      } else if (errorMsg.contains('weak_password')) {
+        errorMsg =
+            'Password is too weak. Use at least 6 characters with mix of letters.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMsg), duration: const Duration(seconds: 5)),
+        SnackBar(
+          content: Text(errorMsg),
+          duration: const Duration(seconds: 6),
+          backgroundColor: Colors.red.shade700,
+        ),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
   }
 
   @override

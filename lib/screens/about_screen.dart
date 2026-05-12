@@ -158,7 +158,7 @@ class AboutScreen extends StatelessWidget {
             _buildLocation(
               context,
               'Rawalpindi Branch',
-              'Main Street, Rawalpindi',
+              'Main iqbal road , committee chowk , Rawalpindi',
               '+923325664504',
             ),
             _buildLocation(
@@ -189,7 +189,7 @@ class AboutScreen extends StatelessWidget {
                 ),
                 _buildContactIcon(
                   Icons.email,
-                  '[EMAIL_ADDRESS]',
+                  'shireenbakers71@gmail.com',
                 ),
               ],
             ),
