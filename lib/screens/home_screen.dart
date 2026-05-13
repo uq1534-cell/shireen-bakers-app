@@ -21,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedCategoryIndex = 0;
   final _searchController = TextEditingController();
   List<Product> _searchResults = [];
-  bool _showSearchResults = false;
 
   final List<String> _banners = const [
     'assets/images/main.png',
@@ -40,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (query.isEmpty) {
       setState(() {
         _searchResults = [];
-        _showSearchResults = false;
       });
       return;
     }
@@ -53,10 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _searchResults = results;
-      _showSearchResults = true;
     });
 
-    // Auto-navigate if only 1 result
     if (results.length == 1) {
       _navigateToProduct(results[0]);
     }
@@ -66,12 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchController.clear();
     setState(() {
       _searchResults = [];
-      _showSearchResults = false;
     });
     Navigator.pushNamed(context, '/product-detail', arguments: product.id);
   }
 
-  void _showSearchResults() {
+  void _showSearchResultsModal() {
     if (_searchResults.isEmpty) return;
 
     showModalBottomSheet(
@@ -171,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: CustomScrollView(
         slivers: [
-          // ── Compact Search Header ─────────────────────────────────────
           SliverPersistentHeader(
             pinned: true,
             delegate: _CompactSearchHeader(
@@ -181,12 +175,10 @@ class _HomeScreenState extends State<HomeScreen> {
               searchController: _searchController,
               onSearch: _performSearch,
               searchResults: _searchResults,
-              showResults: _showSearchResults,
               onProductTap: _navigateToProduct,
+              onShowResults: _showSearchResultsModal,
             ),
           ),
-
-          // ── Hero Slider ───────────────────────────────────────────────
           SliverToBoxAdapter(
             child: CarouselSlider(
               options: CarouselOptions(
@@ -211,10 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   .toList(),
             ),
           ),
-
           const SliverToBoxAdapter(child: SizedBox(height: 22)),
-
-          // ── Categories Label ──────────────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -235,8 +224,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ]),
             ),
           ),
-
-          // ── Horizontal Categories ─────────────────────────────────────
           SliverToBoxAdapter(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -260,10 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           const SliverToBoxAdapter(child: SizedBox(height: 22)),
-
-          // ── Featured Products Label ───────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -284,8 +268,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ]),
             ),
           ),
-
-          // ── Products Grid ─────────────────────────────────────────────
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             sliver: SliverGrid(
@@ -301,7 +283,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
@@ -435,9 +416,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Compact Search Header
-// ─────────────────────────────────────────────────────────────────────────────
 class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
   final VoidCallback onCartTap;
   final VoidCallback onLoginTap;
@@ -445,8 +423,8 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
   final TextEditingController searchController;
   final Function(String) onSearch;
   final List<Product> searchResults;
-  final bool showResults;
   final Function(Product) onProductTap;
+  final VoidCallback onShowResults;
 
   const _CompactSearchHeader({
     required this.onCartTap,
@@ -455,8 +433,8 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
     required this.searchController,
     required this.onSearch,
     required this.searchResults,
-    required this.showResults,
     required this.onProductTap,
+    required this.onShowResults,
   });
 
   static const double _h = 116;
@@ -467,8 +445,7 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
   double get maxExtent => _h;
   @override
   bool shouldRebuild(covariant _CompactSearchHeader old) =>
-      old.searchResults.length != searchResults.length ||
-      old.showResults != showResults;
+      old.searchResults.length != searchResults.length;
 
   @override
   Widget build(BuildContext ctx, double shrinkOffset, bool overlaps) {
@@ -493,197 +470,176 @@ class _CompactSearchHeader extends SliverPersistentHeaderDelegate {
           child: SafeArea(
             bottom: false,
             child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Row 1 — hamburger | logo | login + cart
-                    SizedBox(
-                      height: 54,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(children: [
-                          // Hamburger
-                          Builder(
-                              builder: (bCtx) => IconButton(
-                                    onPressed: () => onMenuTap(bCtx),
-                                    icon: const Icon(Icons.menu_rounded,
-                                        color: Color(0xFF5A3E1B), size: 26),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(
-                                        minWidth: 36, minHeight: 36),
-                                  )),
-
-                          // Logo + brand name stacked
-                          Expanded(
-                              child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/images/logo_transparent.png',
-                                  height: 34,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.cake_rounded,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 54,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(children: [
+                      Builder(
+                          builder: (bCtx) => IconButton(
+                                onPressed: () => onMenuTap(bCtx),
+                                icon: const Icon(Icons.menu_rounded,
+                                    color: Color(0xFF5A3E1B), size: 26),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(
+                                    minWidth: 36, minHeight: 36),
+                              )),
+                      Expanded(
+                          child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo_transparent.png',
+                              height: 34,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.cake_rounded,
+                                color: Color(0xFFE6BC15),
+                                size: 30,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            RichText(
+                              text: const TextSpan(children: [
+                                TextSpan(
+                                  text: 'SHIREEN ',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF757575),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'BAKERS',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
                                     color: Color(0xFFE6BC15),
-                                    size: 30,
+                                    letterSpacing: 1.5,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                RichText(
-                                  text: const TextSpan(children: [
-                                    TextSpan(
-                                      text: 'SHIREEN ',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xFF757575),
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'BAKERS',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xFFE6BC15),
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                  ]),
-                                ),
-                              ],
+                              ]),
                             ),
-                          )),
-
-                          // Login / Account pill
-                          GestureDetector(
-                            onTap: loggedIn
-                                ? () => Navigator.pushNamed(context, '/account')
-                                : onLoginTap,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: loggedIn
-                                    ? const Color(0xFFE6BC15)
-                                    : const Color(0xFF757575),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                loggedIn ? 'Account' : 'Login',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          // Cart icon + badge
-                          GestureDetector(
-                            onTap: onCartTap,
-                            child: Stack(clipBehavior: Clip.none, children: [
-                              const Padding(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(Icons.shopping_cart_outlined,
-                                    color: Color(0xFF0F0F0F), size: 25),
-                              ),
-                              if (count > 0)
-                                Positioned(
-                                  top: -2,
-                                  right: -2,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFE6BC15),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text('$count',
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w700)),
-                                  ),
-                                ),
-                            ]),
-                          ),
-                        ]),
-                      ),
-                    ),
-
-                    // Row 2 — search bar
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_searchResults.isNotEmpty) {
-                            _showSearchResults();
-                          }
-                        },
+                          ],
+                        ),
+                      )),
+                      GestureDetector(
+                        onTap: loggedIn
+                            ? () => Navigator.pushNamed(context, '/account')
+                            : onLoginTap,
                         child: Container(
-                          height: 40,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                                color: const Color(0xFFE6BC15), width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    Colors.black.withValues(alpha: 0.07),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              )
-                            ],
+                            color: loggedIn
+                                ? const Color(0xFFE6BC15)
+                                : const Color(0xFF757575),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Row(children: [
-                            const SizedBox(width: 14),
-                            const Icon(Icons.search_rounded,
-                                color: Color(0xFFE6BC15), size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                                child: TextField(
-                              controller: searchController,
-                              onChanged: onSearch,
-                              onSubmitted: (_) {
-                                if (searchResults.isNotEmpty) {
-                                  onProductTap(searchResults[0]);
-                                }
-                              },
-                              decoration: const InputDecoration(
-                                hintText: 'Search for cakes, bread, pastries...',
-                                hintStyle: TextStyle(
-                                    color: Color(0xFF9E9E9E), fontSize: 13),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                              style: const TextStyle(
-                                  fontSize: 13, color: Color(0xFF0F0F0F)),
-                            )),
-                            if (searchController.text.isNotEmpty)
-                              GestureDetector(
-                                onTap: () {
-                                  searchController.clear();
-                                  onSearch('');
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.only(right: 8),
-                                  child: Icon(Icons.close,
-                                      color: Color(0xFF9E9E9E), size: 18),
-                                ),
-                              )
-                            else
-                              const SizedBox(width: 10),
-                          ]),
+                          child: Text(
+                            loggedIn ? 'Account' : 'Login',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: onCartTap,
+                        child: Stack(clipBehavior: Clip.none, children: [
+                          const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(Icons.shopping_cart_outlined,
+                                color: Color(0xFF0F0F0F), size: 25),
+                          ),
+                          if (count > 0)
+                            Positioned(
+                              top: -2,
+                              right: -2,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFE6BC15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text('$count',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w700)),
+                              ),
+                            ),
+                        ]),
+                      ),
+                    ]),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                  child: Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                          color: const Color(0xFFE6BC15), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.07),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: Row(children: [
+                      const SizedBox(width: 14),
+                      const Icon(Icons.search_rounded,
+                          color: Color(0xFFE6BC15), size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: TextField(
+                        controller: searchController,
+                        onChanged: onSearch,
+                        onSubmitted: (_) {
+                          if (searchResults.isNotEmpty) {
+                            onProductTap(searchResults[0]);
+                          }
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'Search for cakes, bread, pastries...',
+                          hintStyle:
+                              TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: const TextStyle(
+                            fontSize: 13, color: Color(0xFF0F0F0F)),
+                      )),
+                      if (searchController.text.isNotEmpty)
+                        GestureDetector(
+                          onTap: () {
+                            searchController.clear();
+                            onSearch('');
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(right: 8),
+                            child: Icon(Icons.close,
+                                color: Color(0xFF9E9E9E), size: 18),
+                          ),
+                        )
+                      else
+                        const SizedBox(width: 10),
+                    ]),
+                  ),
+                ),
+              ],
             ),
           ),
         );
